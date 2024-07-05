@@ -10,15 +10,18 @@ Invoke-WebRequest -Uri $url -OutFile $savePath
 Write-Host "正在设置壁纸..."
 
 # 使用 COM 对象修改壁纸
+Add-Type @"
+    using System;
+    using System.Runtime.InteropServices;
+    
+    public class Wallpaper {
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+        public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+    }
+"@
+
+# 设置壁纸
 $SPI_SETDESKWALLPAPER = 20
-$code = @"
-using System;
-using System.Runtime.InteropServices;
+[Wallpaper]::SystemParametersInfo($SPI_SETDESKWALLPAPER, 0, $savePath, 3)
 
-public class Wallpaper {
-    [DllImport("user32.dll", CharSet=CharSet.Auto)]
-    public static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
-}
-
-public class Example {
-    private static void test ( ) { If you strict
+Write-Host "壁纸设置完成！"
