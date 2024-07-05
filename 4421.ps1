@@ -1,15 +1,8 @@
-# 设置下载的图片链接和保存路径
 $url = "https://img.picui.cn/free/2024/07/05/6687d2f9c0915.png"
 $savePath = "D:\6687d2f9c0915.png"
 
-# 下载图片到指定路径
-Write-Host "正在下载图片..."
 Invoke-WebRequest -Uri $url -OutFile $savePath
 
-# 设置壁纸
-Write-Host "正在设置壁纸..."
-
-# 使用 COM 对象修改壁纸
 Add-Type @"
     using System;
     using System.Runtime.InteropServices;
@@ -20,8 +13,6 @@ Add-Type @"
     }
 "@
 
-# 调用设置壁纸的方法
 $SPI_SETDESKWALLPAPER = 20
 $null = [Wallpaper]::SystemParametersInfo($SPI_SETDESKWALLPAPER, 0, $savePath, 3)
 
-Write-Host "壁纸设置完成。"
