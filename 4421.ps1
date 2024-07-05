@@ -13,15 +13,15 @@ Write-Host "正在设置壁纸..."
 Add-Type @"
     using System;
     using System.Runtime.InteropServices;
-    
+
     public class Wallpaper {
         [DllImport("user32.dll", CharSet=CharSet.Auto)]
-        public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+        public static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
     }
 "@
 
-# 设置壁纸
+# 调用设置壁纸的方法
 $SPI_SETDESKWALLPAPER = 20
-[Wallpaper]::SystemParametersInfo($SPI_SETDESKWALLPAPER, 0, $savePath, 3)
+$null = [Wallpaper]::SystemParametersInfo($SPI_SETDESKWALLPAPER, 0, $savePath, 3)
 
-Write-Host "壁纸设置完成！"
+Write-Host "壁纸设置完成。"
