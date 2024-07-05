@@ -1,0 +1,66 @@
+function Set-Wallpaper
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$Path,
+
+        [ValidateSet('Center', 'Stretch')]
+        [string]$Style = 'Stretch'
+    )
+
+    Add-Type @"
+        using System;
+        using System.Runtime.InteropServices;
+        using Microsoft.Win32;
+
+        namespace Wallpaper
+        {
+            public enum Style : int
+            {
+                Center, Stretch
+            }
+
+            public class Setter
+            {
+                public const int SetDesktopWallpaper = 20;
+                public const int UpdateIniFile = 0x01;
+                public const int SendWinIniChange = 0x02;
+
+                [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+                private static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+
+                public static void SetWallpaper(string path, Wallpaper.Style style)
+                {
+                    SystemParametersInfo(SetDesktopWallpaper, 0, path, UpdateIniFile | SendWinIniChange);
+
+                    RegistryKey key = Registry.CurrentUser.OpenSubKey("Control Panel\\Desktop", true);
+                    switch (style)
+                    {
+                        case Style.Stretch:
+                            key.SetValue("WallpaperStyle", "2");
+                            key.SetValue("TileWallpaper", "0");
+                            break;
+                        case Style.Center:
+                            key.SetValue("WallpaperStyle", "1");
+                            key.SetValue("TileWallpaper", "0");
+                            break;
+                    }
+                    key.Close();
+                }
+            }
+        }
+"@
+
+    [string]$ImagePath = $Path
+
+    [Wallpaper.Setter]::SetWallpaper($ImagePath, $Style)
+}
+
+# 下载图片到指定路径
+$url = "https://img.picui.cn/free/2024/07/05/6687d2f9c0915.png"
+$output = "D:\6687d2f9c0915.png"
+
+Invoke-WebRequest -Uri $url -OutFile $output
+
+# 设置壁纸
+Set-Wallpaper -Path $output -Style 'Stretch'
